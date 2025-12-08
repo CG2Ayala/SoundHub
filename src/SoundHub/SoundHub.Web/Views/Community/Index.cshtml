@@ -1,0 +1,32 @@
+﻿@model List<SoundHub.Web.Models.Community>
+
+@{
+    ViewData["Title"] = "Comunidades";
+}
+
+<h2>Comunidades</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Crear Comunidad</a>
+
+@if (Model == null || !Model.Any())
+{
+    <p class="text-muted">No hay comunidades creadas aún.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var c in Model)
+        {
+            <li class="list-group-item">
+                <h5>@c.Name</h5>
+                <p>@c.Description</p>
+                <small class="text-muted">
+                    Por @c.OwnerId · @c.CreatedAt
+                </small>
+            </li>
+        }
+    </ul>
+}
+
+
+

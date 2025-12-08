@@ -1,0 +1,245 @@
+﻿@model IEnumerable<SoundHub.Web.Models.Post>
+
+@{
+    var communities = ViewData["Communities"] as List<SoundHub.Web.Models.Community>
+                      ?? new List<SoundHub.Web.Models.Community>();
+
+    ViewData["Title"] = "Feed - SoundHub";
+}
+
+<div class="container mt-4">
+    <div class="row">
+
+        <!-- ========== SIDEBAR IZQUIERDO ========== -->
+        <div class="col-md-3 mb-3">
+
+            <!-- Lista de Comunidades -->
+            <div class="card p-3">
+                <h5 class="mb-2">Comunidades</h5>
+
+                @if (!communities.Any())
+                {
+                    <p class="text-muted small">Aún no hay comunidades.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var c in communities)
+                        {
+                            <li class="list-group-item px-0">
+                                <strong>@c.Name</strong><br />
+                                <span class="small text-muted">@c.Description</span>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                <div class="mt-3 d-grid">
+                    <a asp-controller="Community" asp-action="Create" class="btn btn-sm btn-primary">
+                        Crear comunidad
+                    </a>
+                </div>
+            </div>
+
+            <!-- Buscador del Feed -->
+            <div class="card p-3 mt-3">
+                <form asp-action="Search" method="get">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="q" class="form-control"
+                               placeholder="Buscar en el feed..."
+                               value="@(ViewData["SearchTerm"] ?? "")" />
+
+                        <button class="btn btn-outline-secondary" type="submit">
+                            Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+
+        <!-- ========== FEED CENTRAL ========== -->
+        <div class="col-md-6 mb-3">
+
+            <!-- Crear Publicación -->
+            <div class="card mb-3 p-3 shadow-sm">
+                <h6 class="text-muted mb-2">Crear nueva publicación</h6>
+
+                <form asp-action="Create" method="post">
+                    <div class="mb-2">
+                        <textarea name="text" class="form-control" rows="3"
+                                  placeholder="¿Qué estás escuchando?"></textarea>
+                    </div>
+
+                    <div class="mb-2">
+                        <input name="artistName"
+                               class="form-control"
+                               placeholder="Nombre del artista (opcional, se buscará en Spotify)" />
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Publicar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Renderizar Posts -->
+            @foreach (var p in Model)
+            {
+                <div class="card mb-3 shadow-sm post-card">
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <div class="fw-semibold">@p.AuthorId</div>
+                                <div class="small text-muted">
+                                    @p.CreatedAt.ToLocalTime().ToString("g")
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(p.ImageUrl))
+                        {
+                            <img src="@p.ImageUrl"
+                                 alt="@p.ArtistName"
+                                 class="img-fluid rounded mb-2"
+                                 style="max-height:250px; width:100%; object-fit:cover;" />
+                        }
+
+                        <p>@p.Text</p>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                @if (!string.IsNullOrEmpty(p.ArtistName))
+                                {
+                                    <span class="badge bg-secondary">@p.ArtistName</span>
+                                }
+                            </div>
+
+                            <div>
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="Details"
+                                   asp-route-id="@p.Id">
+                                    Ver
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+
+
+        <!-- ========== SIDEBAR DERECHO ========== -->
+        <div class="col-md-3 mb-3">
+            <div class="card p-3">
+                <h6 class="fw-bold">SoundHub</h6>
+                <p class="small text-muted">
+                    Una red social para descubrir artistas, crear comunidades
+                    y compartir tu música favorita.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+
+    /* ======== ROOT COLORS ======== */
+    :root {
+        --primary-blue: #4A7BFF;
+        --primary-purple: #7A5CFF;
+        --accent-pink: #FF7BC3;
+        --accent-cyan: #7BE3FF;
+        --bg-dark: #1E1E2E;
+        --bg-card: #252537;
+        --text-main: #ffffff;
+        --text-soft: #c4c4c4;
+    }
+
+    /* ======== GLOBAL ======== */
+    body {
+        background: var(--bg-dark);
+        color: var(--text-main);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ======== CARDS ======== */
+    .card {
+        background: var(--bg-card) !important;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.06);
+        color: var(--text-main);
+    }
+
+        .card h5,
+        .card h6 {
+            color: var(--accent-cyan);
+        }
+
+    /* ======== POST CARDS ======== */
+    .post-card {
+        border-left: 4px solid var(--primary-purple);
+    }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            transition: 0.2s ease-in-out;
+        }
+
+    /* ======== BUTTONS ======== */
+    .btn-primary {
+        background: linear-gradient(90deg, var(--primary-blue), var(--primary-purple));
+        border: none;
+    }
+
+        .btn-primary:hover {
+            opacity: 0.85;
+        }
+
+    .btn-success {
+        background: linear-gradient(90deg, var(--accent-pink), var(--accent-cyan));
+        border: none;
+    }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+    /* ======== LISTA DE COMUNIDADES ======== */
+    .list-group-item {
+        background: transparent !important;
+        border: none;
+        color: var(--text-main);
+    }
+
+        .list-group-item strong {
+            color: var(--accent-cyan);
+        }
+
+    .small.text-muted {
+        color: var(--text-soft) !important;
+    }
+
+    /* ======== INPUTS ======== */
+    input, textarea {
+        background: #1b1b28 !important;
+        border: 1px solid #3a3a4a !important;
+        color: var(--text-main) !important;
+    }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #8d8da6 !important;
+        }
+
+</style>
+
+
+

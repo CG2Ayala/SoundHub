@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Crear publicación";
+}
+<h2>Crear publicación</h2>
+<form method="post" asp-action="Create">
+    <div class="form-group mb-2">
+        <label>Texto</label>
+        <textarea name="text" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="form-group mb-2">
+        <label>Artista (opcional)</label>
+        <input name="artistName" class="form-control" />
+    </div>
+    <button class="btn btn-primary" type="submit">Publicar</button>
+    <a class="btn btn-secondary" href="@Url.Action("Index", "Post")">Cancelar</a>
+</form>
+

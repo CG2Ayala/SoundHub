@@ -1,0 +1,32 @@
+﻿@model SoundHub.Web.Models.Community
+@{
+    ViewData["Title"] = "Detalles Comunidad";
+    var members = (IEnumerable<SoundHub.Web.Models.CommunityMember>)ViewData["Members"];
+}
+
+<h2>@Model.Name</h2>
+<p class="text-muted">Creada por: @Model.OwnerId • @Model.CreatedAt.ToLocalTime()</p>
+<p>@Model.Description</p>
+
+<hr />
+
+<h5>Miembros (@(members?.Count() ?? 0))</h5>
+<ul class="list-group mb-3">
+    @if (members != null && members.Any())
+    {
+        foreach (var m in members)
+        {
+            <li class="list-group-item">@m.UserId • @m.JoinedAt.ToLocalTime()</li>
+        }
+    }
+    else
+    {
+        <li class="list-group-item text-muted">Sin miembros todavía</li>
+    }
+</ul>
+
+<form method="post" asp-action="Join">
+    <input type="hidden" name="communityId" value="@Model.Id" />
+    <button class="btn btn-primary" type="submit">Unirme</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
